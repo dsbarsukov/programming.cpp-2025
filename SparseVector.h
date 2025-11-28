@@ -15,11 +15,20 @@ private:
     
     node* head_;
 
+    void clear();                             // Очистка всего списка
+    void copyList(const SparseVector& other); // Копирование всего списка
+    void insertNode(int index, int value);    // Вставка узла
+    void removeNode(int index);               // Удаление узла
+
 public:
+    // Конструкторы и деструктор
     SparseVector(int size);
+    SparseVector(const SparseVector& other);
     ~SparseVector();
-    
-    int getSize() const;
+
+    int getSize() const;                      // Получение размера вектора
+    int getElem(int index) const;             // Получение элемента
+    void setElem(int index, int value);       // Установка элемента
 };
 
 #endif
