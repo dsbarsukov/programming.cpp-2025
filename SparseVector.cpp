@@ -1,5 +1,6 @@
 #include "SparseVector.h"
 #include <stdexcept>
+#include <iostream>
 
 // Конструктор узла
 SparseVector::node::node(int index, int value, node* next) : index(index), value(value), next(next) {
@@ -51,9 +52,30 @@ void SparseVector::copyList(const SparseVector& other) {
     }
 }
 
-// Вставка узла (упрощенная версия: Нужно 1. Поиск позиции для вставки + перелинковкой указателей 2. Проверка существования узла с таким индексом + Обновление значения)
+// Вставка узла
 void SparseVector::insertNode(int index, int value) {
-    head_ = new node(index, value, head_);
+    node* current = head_;
+    node* prev = nullptr;
+
+    while (current != nullptr && current->index < index) {
+        prev = current;
+        current = current->next;
+    }
+
+    if (current != nullptr && current->index == index) {
+        current->value = value;
+        return;
+    }
+
+    node* newNode = new node(index, value);
+
+    if (prev == nullptr) {
+        newNode->next = head_;
+        head_ = newNode;
+    } else {
+        newNode->next = current;
+        prev->next = newNode;
+    }
 }
 
 // Удаление узла
@@ -90,6 +112,10 @@ int SparseVector::getElem(int index) const {
         if (current->index == index) {
             return current->value;
         }
+
+        if (current->index > index) {
+            break;
+        }
         current = current->next;
     }
 
@@ -112,4 +138,88 @@ void SparseVector::setElem(int index, int value) {
 // Получение размера вектора
 int SparseVector::getSize() const {
     return size_;
+}
+
+void SparseVector::printAllNodes() const {
+    std::cout << "head_ → ";
+    node* current = head_;
+    while (current != nullptr) {
+        std::cout << "[" << current->index << ", " << current->value << "] → ";
+        current = current->next;
+    }
+    std::cout << "nullptr" << std::endl;
+}
+
+// Оператор присваивания
+SparseVector& SparseVector::operator=(const SparseVector& other) {
+    if (this == &other) {
+        return *this;
+    }
+
+    if (size_ != other.size_) {
+        throw std::invalid_argument("Векторы должны иметь одинаковый размер");
+    }
+
+    clear();
+    copyList(other);
+    return *this;
+}
+
+// Оператор +=
+SparseVector& SparseVector::operator+=(const SparseVector& other) {
+    if (size_ != other.size_) {
+        throw std::invalid_argument("Векторы должны иметь одинаковый размер");
+    }
+
+    node* current = other.head_;
+    while (current != nullptr) {
+        setElem(current->index, getElem(current->index) + current->value);
+        current = current->next;
+    }
+    return *this;
+}
+
+// Оператор -=
+SparseVector& SparseVector::operator-=(const SparseVector& other) {
+    if (size_ != other.size_) {
+        throw std::invalid_argument("Векторы должны иметь одинаковый размер");
+    }
+
+    node* сurrent = other.head_;
+    while (сurrent != nullptr) {
+        setElem(сurrent->index, getElem(сurrent->index) - сurrent->value);
+        сurrent = сurrent->next;
+    }
+    return *this;
+}
+
+// Оператор +
+SparseVector SparseVector::operator+(const SparseVector& other) const {
+    SparseVector result(*this);
+    result += other;
+    return result;
+}
+
+// Оператор -
+SparseVector SparseVector::operator-(const SparseVector& other) const {
+    SparseVector result(*this);
+    result -= other;
+    return result;
+}
+
+// Оператор ==
+bool SparseVector::operator==(const SparseVector& other) const {
+    if (size_ != other.size_) return false;
+
+    for (int i = 0; i < size_; i++) {
+        if (getElem(i) != other.getElem(i)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Оператор !=
+bool SparseVector::operator!=(const SparseVector& other) const {
+    return !(*this == other);
 }
