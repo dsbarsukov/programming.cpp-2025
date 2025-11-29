@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include <iostream>
 
+using namespace std;
+
 // Конструктор узла
 SparseVector::node::node(int index, int value, node* next) : index(index), value(value), next(next) {
 }
@@ -9,13 +11,14 @@ SparseVector::node::node(int index, int value, node* next) : index(index), value
 // Основной конструктор
 SparseVector::SparseVector(int size) : size_(size), head_(nullptr) {
     if (size <= 0) {
-        throw std::invalid_argument("Размер вектора должен быть положительным");
+        throw invalid_argument("Размер вектора должен быть положительным");
     }
 }
 
 // Конструктор копирования
 SparseVector::SparseVector(const SparseVector& other) : size_(other.size_), head_(nullptr) {
     copyList(other);
+    checkListOrder();
 }
 
 // Деструктор
@@ -54,6 +57,7 @@ void SparseVector::copyList(const SparseVector& other) {
 
 // Вставка узла
 void SparseVector::insertNode(int index, int value) {
+    // head_ = new node(index, value, head_); // Оставил старую версию, чтобы посмотреть на checkListOrder()
     node* current = head_;
     node* prev = nullptr;
 
@@ -76,6 +80,7 @@ void SparseVector::insertNode(int index, int value) {
         newNode->next = current;
         prev->next = newNode;
     }
+    checkListOrder();
 }
 
 // Удаление узла
@@ -99,12 +104,102 @@ void SparseVector::removeNode(int index) {
         current->next = current->next->next;
         delete temp;
     }
+    checkListOrder();
+}
+
+// Сложение (add=true) или вычитание (add=false) векторов
+void SparseVector::addSubVector(const SparseVector& other, bool add) {
+    int sign = (add ? 1 : -1);
+    node* thisCurrent = head_;
+    node* thisPrev = nullptr;
+    node* otherCurrent = other.head_;
+
+    while (otherCurrent != nullptr) {
+        int otherIndex = otherCurrent->index;
+        int otherValue = sign * otherCurrent->value;
+
+        while (thisCurrent != nullptr && thisCurrent->index < otherIndex) {
+            thisPrev = thisCurrent;
+            thisCurrent = thisCurrent->next;
+        }
+
+        if (thisCurrent != nullptr && thisCurrent->index == otherIndex) {
+            thisCurrent->value += otherValue;
+        } else {
+            node* newNode = new node(otherIndex, otherValue);
+
+            if (thisPrev == nullptr) {
+                newNode->next = head_;
+                head_ = newNode;
+            } else {
+                newNode->next = thisCurrent;
+                thisPrev->next = newNode;
+            }
+            thisPrev = newNode;
+        }
+
+        otherCurrent = otherCurrent->next;
+    }
+    checkListOrder();
+}
+
+// Удаление нулей
+void SparseVector::removeZeros() {
+    node* current = head_;
+    node* prev = nullptr;
+
+    while (current != nullptr) {
+        if (current->value == 0) {
+            node* toDelete = current;
+            if (prev == nullptr) {
+                head_ = current->next;
+            } else {
+                prev->next = current->next;
+            }
+            current = current->next;
+            delete toDelete;
+        } else {
+            prev = current;
+            current = current->next;
+        }
+    }
+}
+
+// Проверка корректности порядка узлов в списке
+void SparseVector::checkListOrder() const {
+    node* current = head_;
+
+    while (current != nullptr && current->next != nullptr) {
+        if (current->index >= current->next->index) {
+            cerr << "=== ОШИБКА В ВЕКТОРЕ ===" << endl;
+            cerr << "Размер вектора: " << size_ << endl;
+            cerr << "Нарушен порядок узлов!" << endl;
+            cerr << "Узел [" << current->index << "," << current->value
+                      << "] должен быть ПЕРЕД узлом [" << current->next->index
+                      << "," << current->next->value << "]" << endl;
+            cerr << "Текущий список: ";
+
+            cerr << "head_ → ";
+            node* current = head_;
+            while (current != nullptr) {
+                cerr << "[" << current->index << ", " << current->value << "] → ";
+                current = current->next;
+            }
+            cerr << "nullptr" << endl;
+
+            cerr << "========================" << endl;
+
+            throw runtime_error("Нарушен порядок");
+        }
+        current = current->next;
+    }
 }
 
 // Получение элемента
 int SparseVector::getElem(int index) const {
+    checkListOrder();
     if (index < 0 || index >= size_) {
-        throw std::out_of_range("Индекс вне диапазона");
+        throw out_of_range("Индекс вне диапазона");
     }
 
     node* current = head_;
@@ -125,7 +220,7 @@ int SparseVector::getElem(int index) const {
 // Установка элемента
 void SparseVector::setElem(int index, int value) {
     if (index < 0 || index >= size_) {
-        throw std::out_of_range("Индекс вне диапазона");
+        throw out_of_range("Индекс вне диапазона");
     }
 
     if (value == 0) {
@@ -133,6 +228,7 @@ void SparseVector::setElem(int index, int value) {
     } else {
         insertNode(index, value);
     }
+    checkListOrder();
 }
 
 // Получение размера вектора
@@ -141,13 +237,13 @@ int SparseVector::getSize() const {
 }
 
 void SparseVector::printAllNodes() const {
-    std::cout << "head_ → ";
+    cout << "head_ → ";
     node* current = head_;
     while (current != nullptr) {
-        std::cout << "[" << current->index << ", " << current->value << "] → ";
+        cout << "[" << current->index << ", " << current->value << "] → ";
         current = current->next;
     }
-    std::cout << "nullptr" << std::endl;
+    cout << "nullptr" << endl;
 }
 
 // Оператор присваивания
@@ -157,39 +253,36 @@ SparseVector& SparseVector::operator=(const SparseVector& other) {
     }
 
     if (size_ != other.size_) {
-        throw std::invalid_argument("Векторы должны иметь одинаковый размер");
+        throw invalid_argument("Векторы должны иметь одинаковый размер");
     }
 
     clear();
     copyList(other);
+    checkListOrder();
     return *this;
 }
 
 // Оператор +=
 SparseVector& SparseVector::operator+=(const SparseVector& other) {
     if (size_ != other.size_) {
-        throw std::invalid_argument("Векторы должны иметь одинаковый размер");
+        throw invalid_argument("Векторы должны иметь одинаковый размер");
     }
 
-    node* current = other.head_;
-    while (current != nullptr) {
-        setElem(current->index, getElem(current->index) + current->value);
-        current = current->next;
-    }
+    addSubVector(other, true);
+    removeZeros();
+    checkListOrder();
     return *this;
 }
 
 // Оператор -=
 SparseVector& SparseVector::operator-=(const SparseVector& other) {
     if (size_ != other.size_) {
-        throw std::invalid_argument("Векторы должны иметь одинаковый размер");
+        throw invalid_argument("Векторы должны иметь одинаковый размер");
     }
 
-    node* сurrent = other.head_;
-    while (сurrent != nullptr) {
-        setElem(сurrent->index, getElem(сurrent->index) - сurrent->value);
-        сurrent = сurrent->next;
-    }
+    addSubVector(other, false);
+    removeZeros();
+    checkListOrder();
     return *this;
 }
 

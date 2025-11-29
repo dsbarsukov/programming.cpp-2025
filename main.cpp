@@ -5,18 +5,21 @@ using namespace std;
 
 int main() {
 
-    SparseVector v(10);
-    v.setElem(1, 3);
-    v.setElem(3, 4);
-    v.setElem(7, 10);
-    v.setElem(4, -10);
+    SparseVector v1(10);
+    v1.setElem(1, 3);
+    v1.setElem(3, 4);
+    v1.setElem(7, 10);
+    v1.setElem(4, -10);
 
-    for ( int i = 0; i < v.getSize(); i ++ ) {
-        cout << "[ " << i << " ] = " << v.getElem(i) << endl;
-    }
+    SparseVector v2(10);
+    v2.setElem(1, 3);
+    v2.setElem(3, -4);
+    v2.setElem(7, 70);
+    v2.setElem(2, -10);
 
-    cout << endl;
+    v1.printAllNodes();
+    v2.printAllNodes();
+    (v1 + v2).printAllNodes();
 
-    v.printAllNodes();
     return 0;
 }

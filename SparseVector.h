@@ -15,10 +15,13 @@ private:
     
     node* head_;
 
-    void clear();                             // Очистка всего списка
-    void copyList(const SparseVector& other); // Копирование всего списка
-    void insertNode(int index, int value);    // Вставка узла
-    void removeNode(int index);               // Удаление узла
+    void clear();                                               // Очистка всего списка
+    void copyList(const SparseVector& other);                   // Копирование всего списка
+    void insertNode(int index, int value);                      // Вставка узла
+    void removeNode(int index);                                 // Удаление узла
+    void addSubVector(const SparseVector& other, bool add);     // Сложение/вычитание двух векторов
+    void removeZeros();                                         // Удаление нулей
+    void checkListOrder() const;                                // Проверка корректности порядка узлов в списке
 
 public:
     // Конструкторы и деструктор
@@ -26,10 +29,10 @@ public:
     SparseVector(const SparseVector& other);
     ~SparseVector();
 
-    int getSize() const;                      // Получение размера вектора
-    int getElem(int index) const;             // Получение элемента
-    void setElem(int index, int value);       // Установка элемента
-    void printAllNodes() const;               // Вывод связанного списка
+    int getSize() const;                                        // Получение размера вектора
+    int getElem(int index) const;                               // Получение элемента
+    void setElem(int index, int value);                         // Установка элемента
+    void printAllNodes() const;                                 // Вывод связанного списка
 
     // Перегрузка операторов
     SparseVector& operator=(const SparseVector& other);
