@@ -7,7 +7,7 @@
 ```bash
 # Клонирование и сборка
 git clone https://github.com/dsbarsukov/programming.cpp-2025.git
-cd programming_cpp_2025
+cd programming.cpp-2025
 
 # Сборка проекта
 mkdir build && cd build
