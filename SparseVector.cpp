@@ -236,6 +236,7 @@ int SparseVector::getSize() const {
     return size_;
 }
 
+// Вывод связанного списка
 void SparseVector::printAllNodes() const {
     cout << "head_ → ";
     node* current = head_;

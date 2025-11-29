@@ -20,6 +20,7 @@ int main() {
     v1.printAllNodes();
     v2.printAllNodes();
     (v1 + v2).printAllNodes();
+    (v1 - v2).printAllNodes();
 
     return 0;
 }
