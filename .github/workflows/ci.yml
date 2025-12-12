@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [ ci_test, main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  task-01:
+    name: Task 01
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./task-01-rpn-calculator
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt-get install -y g++ make cmake clang-format
+      - run: find . -name "*.cpp" -o -name "*.h" | xargs clang-format --dry-run --Werror --style=file
+      - run: make
+      - run: make clean && CXXFLAGS="-std=c++11 -fsanitize=address" make
+      - run: |
+          if [ -f CMakeLists.txt ]; then
+            mkdir build && cd build && cmake .. && make
+            [ -f ./rpn_calculator_tests ] && ./rpn_calculator_tests
+          fi
+
+  task-02:
+    name: Task 02
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./task-02-sparse-vector
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt-get install -y g++ make cmake clang-format libgtest-dev
+      - run: cd /usr/src/gtest && sudo cmake . && sudo make && sudo cp lib/*.a /usr/lib
+      - run: find . -name "*.cpp" -o -name "*.h" | xargs clang-format --dry-run --Werror --style=file
+      - run: make
+      - run: make clean && CXXFLAGS="-std=c++14 -fsanitize=address" make
+      - run: |
+          if [ -f CMakeLists.txt ]; then
+            mkdir build && cd build && cmake .. && make
+            [ -f ./sparse_vector_tests ] && ./sparse_vector_tests
+          fi
+
+  task-03:
+    name: Task 03
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./task-03-heap
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt-get install -y g++ make cmake clang-format libgtest-dev
+      - run: cd /usr/src/gtest && sudo cmake . && sudo make && sudo cp lib/*.a /usr/lib
+      - run: find . -name "*.cpp" -o -name "*.h" | xargs clang-format --dry-run --Werror --style=file
+      - run: make
+      - run: make clean && CXXFLAGS="-std=c++14 -fsanitize=address" make
+      - run: |
+          if [ -f CMakeLists.txt ]; then
+            mkdir build && cd build && cmake .. && make
+            [ -f ./heap_tests ] && ./heap_tests
+          fi
