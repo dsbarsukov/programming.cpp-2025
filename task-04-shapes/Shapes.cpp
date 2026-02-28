@@ -1,7 +1,8 @@
 #include "Shapes.h"
 
-#include <stdexcept>
+#include <iostream>
 #include <sstream>
+#include <stdexcept>
 
 Circle::Circle(double r) : r_(r) {
   if (r <= 0.0) {
@@ -9,17 +10,11 @@ Circle::Circle(double r) : r_(r) {
   }
 }
 
-double Circle::area() const {
-  return 3.1415926535897932384 * r_ * r_;
-}
+double Circle::area() const { return 3.1415926535897932384 * r_ * r_; }
 
-ShapeType Circle::type() const noexcept {
-  return ShapeType::Circle;
-}
+ShapeType Circle::type() const noexcept { return ShapeType::Circle; }
 
-string Circle::name() const {
-  return "Circle";
-}
+string Circle::name() const { return "Circle"; }
 
 Rect::Rect(double w, double h) : w_(w), h_(h) {
   if (w <= 0.0 || h <= 0.0) {
@@ -27,17 +22,11 @@ Rect::Rect(double w, double h) : w_(w), h_(h) {
   }
 }
 
-double Rect::area() const {
-  return w_ * h_;
-}
+double Rect::area() const { return w_ * h_; }
 
-ShapeType Rect::type() const noexcept {
-  return ShapeType::Rect;
-}
+ShapeType Rect::type() const noexcept { return ShapeType::Rect; }
 
-string Rect::name() const {
-  return "Rect";
-}
+string Rect::name() const { return "Rect"; }
 
 unique_ptr<Shape> make_shape(ShapeType t, double a, double b) {
   switch (t) {
@@ -93,4 +82,15 @@ double total_area(const vector<unique_ptr<Shape>>& v) {
   }
 
   return sum;
+}
+
+void print_shapes(const vector<unique_ptr<Shape>>& v) {
+  cout << "\nСписок фигур:\n";
+  cout << "=========================\n";
+  int i = 1;
+  for (const unique_ptr<Shape>& ptr : v) {
+    cout << i << ". " << ptr->name() << ": площадь = " << ptr->area() << endl;
+    i += 1;
+  }
+  cout << "=========================\n";
 }

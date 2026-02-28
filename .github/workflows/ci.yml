@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ ci_test, main ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -62,3 +62,17 @@ jobs:
             mkdir build && cd build && cmake .. && make
             [ -f ./heap_tests ] && ./heap_tests
           fi
+
+  task-04:
+    name: Task 04
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./task-04-shapes
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y g++ make cmake clang-format
+      - run: find . -name "*.cpp" -o -name "*.h" | xargs clang-format --dry-run --Werror --style=file
+      - run: make
+      - run: make clean && CXXFLAGS="-std=c++14 -fsanitize=address" make

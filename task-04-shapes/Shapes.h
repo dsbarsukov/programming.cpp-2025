@@ -2,15 +2,15 @@
 #define SHAPES_H
 
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
 using namespace std;
 
 enum class ShapeType { Circle, Rect };
 
 class Shape {
-public:
+ public:
   virtual ~Shape() = default;
   virtual double area() const = 0;
   virtual ShapeType type() const noexcept = 0;
@@ -18,22 +18,24 @@ public:
 };
 
 class Circle final : public Shape {
-public:
+ public:
   explicit Circle(double r);
   double area() const override;
   ShapeType type() const noexcept override;
   string name() const override;
-private:
+
+ private:
   double r_;
 };
 
 class Rect final : public Shape {
-public:
+ public:
   Rect(double w, double h);
   double area() const override;
   ShapeType type() const noexcept override;
   string name() const override;
-private:
+
+ private:
   double w_, h_;
 };
 
@@ -41,5 +43,5 @@ unique_ptr<Shape> make_shape(ShapeType t, double a, double b = 0.0);
 unique_ptr<Shape> parse_shape(const string& line);
 
 double total_area(const vector<unique_ptr<Shape>>& v);
-
+void print_shapes(const vector<unique_ptr<Shape>>& v);
 #endif
