@@ -11,3 +11,6 @@ add_subdirectory(task-02-sparse-vector)
 
 # Задание 3: Heap
 add_subdirectory(task-03-heap)
+
+# Задание 4: Shapes
+add_subdirectory(task-04-shapes)

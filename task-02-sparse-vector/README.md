@@ -28,10 +28,10 @@ cmake ..    # Автоматически скачает GoogleTest
 make        # Компиляция проекта
 
 # Запуск тестов
-./tests
+./sparse_vector_tests
 
 # Запуск демонстрационной программы
-./sparse_vector_tests
+./sparse_vector
 ```
 
 ##  Структура проекта
